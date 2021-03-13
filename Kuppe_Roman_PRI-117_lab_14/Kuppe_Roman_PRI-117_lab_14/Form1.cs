@@ -27,7 +27,7 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
 
         // вспомогательные переменные - в них будут хранится обработанные значения,
         // полученные при перетаскивании ползунков пользователем
-        double a = 0, b = 0, c = -5, d = 0, zoom = 1; // выбранные оси
+        double a = 0, b = 0, c = -5, dX = 0, dY = 0, dZ = 0, zoom = 1; // выбранные оси
         int os_x = 1, os_y = 0, os_z = 0;
 
         // режим сеточной визуализации
@@ -115,41 +115,46 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
         private void RenderTimer_Tick(object sender, EventArgs e) {
             //bool v = Keyboard.IsKeyDown(Key.Up);
             if (Keyboard.IsKeyDown(Key.W)) {
-                d = d + 2;
+                dX = dX + 2;
                 os_x = 1;
                 os_y = 0;
                 os_z = 0;
-                Console.WriteLine("Хуеееета");
             }
             if (Keyboard.IsKeyDown(Key.S)) {
-                d = d - 2;
+                dX = dX - 2;
                 os_x = 1;
                 os_y = 0;
                 os_z = 0;
             }
             if (Keyboard.IsKeyDown(Key.A)) {
-                d = d - 2;
+                dY = dY + 2;
                 os_x = 0;
                 os_y = 1;
                 os_z = 0;
             }
             if (Keyboard.IsKeyDown(Key.D)) {
-                d = d + 2;
+                dY = dY - 2;
                 os_x = 0;
                 os_y = 1;
                 os_z = 0;
             }
             if (Keyboard.IsKeyDown(Key.Q)) {
-                d = d + 2;
+                dZ = dZ + 2;
                 os_x = 0;
                 os_y = 0;
                 os_z = 1;
             }
             if (Keyboard.IsKeyDown(Key.E)) {
-                d = d - 2;
+                dZ = dZ - 2;
                 os_x = 0;
                 os_y = 0;
                 os_z = 1;
+            }
+            if (Keyboard.IsKeyDown(Key.Z)) {
+                c = c - 0.5;
+            }
+            if (Keyboard.IsKeyDown(Key.X)) {
+                c = c + 0.5;
             }
             // вызываем функцию отрисовки сцены
             Draw();
@@ -182,7 +187,9 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
             // производим перемещение в зависимости от значений, полученных при перемещении ползунков
             Gl.glTranslated(a, b, c);
             // поворот по установленной оси
-            Gl.glRotated(d, os_x, os_y, os_z);
+            Gl.glRotated(dY, 0, 1, 0);
+            Gl.glRotated(dX, 1, 0, 0);
+            Gl.glRotated(dZ, 0, 0, 1);
             // и масштабирование объекта
             Gl.glScaled(zoom, zoom, zoom);
 
@@ -253,7 +260,7 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
         }
 
         private void button2_Click(object sender, EventArgs e) {
-            Repeater(button2, 1, d, -1);
+            Repeater(button2, 1, dX, -1);
         }
 
         public void Repeater(Button btn, int interval, double axis, int index) {
@@ -270,7 +277,7 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
         }
 
         private void button3_Click(object sender, EventArgs e) {
-            Repeater(button3, 1, d, 1);
+            Repeater(button3, 1, dX, 1);
         }
 
         private void AnT_Scroll(object sender, ScrollEventArgs e) {
@@ -278,15 +285,14 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
         }
 
         private void AnT_Click(object sender, EventArgs e) {
-            a = a + 10;
-           // Mouse.AddMouseWheelHandler(AnT, (e)=> { });
+
         }
 
         private void trackBar4_Scroll_1(object sender, EventArgs e) {
             // переводим значение, установившееся в элементе trackBar, в необходимый нам формат
-            d = (double)trackBar4.Value;
+            dX = (double)trackBar4.Value;
             // подписываем это значение в label элементе под данным ползунком
-            label10.Text = d.ToString();
+            label10.Text = dX.ToString();
         }
 
         private void trackBar5_Scroll_1(object sender, EventArgs e) {
