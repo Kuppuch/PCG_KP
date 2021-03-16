@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
+using Forms = System.Windows.Forms;
 using Tao.Platform.Windows;
 using Tao.OpenGl;
 using Tao.FreeGlut;
@@ -15,35 +15,29 @@ using System.Windows.Input;
 using System.Threading;
 
 namespace Kuppe_Roman_PRI_117_lab_14 {
-    public partial class Form1: Form {
+    public partial class Form1: Forms.Form {
         public Form1() {
             InitializeComponent();
             AnT.InitializeContexts();
             AnT.MouseWheel += AnT_MouseWheel;
         }
 
-        private void AnT_MouseWheel(object sender, System.Windows.Forms.MouseEventArgs e) {
-            c = c + e.Delta / 100f;
+        private void AnT_MouseWheel(object sender, Forms.MouseEventArgs e) {
+           // c = c + e.Delta / 100f;
         }
 
-        // вспомогательные переменные - в них будут хранится обработанные значения,
-        // полученные при перетаскивании ползунков пользователем
-        double a = 0, b = 0, c = -5, dX = 0, dY = 0, dZ = 0, zoom = 1; // выбранные оси
+        double a = 0, b = 0, c = -5, dX = 0, dY = 0, dZ = 0, zoom = 1;
         int os_x = 1, os_y = 0, os_z = 0;
         bool crop = true;
-
-        // режим сеточной визуализации
-        bool Wire = false;
-
+        Camera cam = new Camera();
         
-
         private void AnT_Load(object sender, EventArgs e) {
             
         }
 
         private void Help() {
             Thread.Sleep(200);
-            MessageBox.Show("W,S - вверх/вниз \n A,D - вправо/влево \n Q,E - поворот вокруг \n Z,X - приблизить/отдалить " +
+            Forms.MessageBox.Show("W,S - вверх/вниз \n A,D - вправо/влево \n Q,E - поворот вокруг \n Z,X - приблизить/отдалить " +
                 "\n Колёсико мыши вверх/вниз - приблизить/отдалить \n R - установка нулевых значений", "Внимание");
         }
 
@@ -75,12 +69,14 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
             Gl.glEnable(Gl.GL_LIGHTING);
             Gl.glEnable(Gl.GL_LIGHT0);
 
+            cam.PositionCamera(0, -15, 5, 0, 0, 0, 0, 1, 0);
+
             // активация таймера, вызывающего функцию для визуализации
             RenderTimer.Start();
             // опции для загрузки файла
             openFileDialog1.Filter = "ase files (*.ase)|*.ase|All files (*.*)|*.*";
-            Thread thread = new Thread(new ThreadStart(Help));
-            thread.Start(); // запускаем поток
+            //Thread thread = new Thread(new ThreadStart(Help));
+            //thread.Start(); // запускаем поток
         }
 
         private void помощьToolStripMenuItem_Click(object sender, EventArgs e) {
@@ -95,6 +91,29 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
             //Zeroing();
             crop = !crop;
         }
+        
+        private void MouseEvents() {
+            if (mouseRotate) { 
+                AnT.Cursor = Forms.Cursors.SizeAll; //меняем указатель 
+                cam.RotatePosition((float)(localMouseYcoordVar - localMouseYcoord), 0, 1, 0); // крутим камеру
+                rot_cam_X = rot_cam_X + (localMouseXcoordVar - localMouseXcoord); 
+                if ((rot_cam_X > -40) && (rot_cam_X < 40)) 
+                    cam.upDown(((float)(localMouseXcoordVar - localMouseXcoord)) / 10); 
+                localMouseYcoord = localMouseYcoordVar; 
+                localMouseXcoord = localMouseXcoordVar; 
+            } else { 
+                if (mouseMove) { 
+                    AnT.Cursor = Forms.Cursors.SizeAll; 
+                    cam.MoveCamera((float)(localMouseXcoordVar - localMouseXcoord) / 50); 
+                    cam.Strafe(-((float)(localMouseYcoordVar - localMouseYcoord) / 50)); 
+                    localMouseYcoord = localMouseYcoordVar; 
+                    localMouseXcoord = localMouseXcoordVar; 
+                } else { 
+                    AnT.Cursor = Forms.Cursors.Default; // возвращаем курсор 
+                }; 
+            }; 
+        }
+
 
         private void RenderTimer_Tick(object sender, EventArgs e) {
             //bool v = Keyboard.IsKeyDown(Key.Up);
@@ -141,7 +160,7 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
                 c = c + 0.5;
             }
             if (Keyboard.IsKeyDown(Key.R)) {
-                Zeroing();
+                Clear();
             }
             // вызываем функцию отрисовки сцены
             if (crop) {
@@ -149,10 +168,30 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
             } else {
                 DrawCrop();
             }
-            
+            MouseEvents(); 
+            cam.update(); 
         }
 
-        public void Zeroing() {
+        private void AnT_MouseDown_1(object sender, Forms.MouseEventArgs e) {
+            if (e.Button == Forms.MouseButtons.Left)
+                mouseRotate = true;
+            if (e.Button == Forms.MouseButtons.Middle)
+                mouseMove = true;
+            localMouseYcoord = e.X;
+            localMouseXcoord = e.Y;
+        }
+
+        private void AnT_MouseUp(object sender, Forms.MouseEventArgs e) {
+            mouseRotate = false;
+            mouseMove = false;
+        }
+
+        private void AnT_MouseMove(object sender, Forms.MouseEventArgs e) {
+            localMouseXcoordVar = e.Y;
+            localMouseYcoordVar = e.X;
+        }
+
+        public void Clear() {
             c = -5;
             dX = 0;
             dY = 0;
@@ -163,8 +202,16 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
 
         }
         anModelLoader Model = null;
+        private bool mouseRotate;
+        private int rot_cam_X;
+        private int localMouseYcoordVar;
+        private int localMouseXcoordVar;
+        private int localMouseYcoord;
+        private int localMouseXcoord;
+        private bool mouseMove;
+
         private void выбратьМодельДляЗагрузкиToolStripMenuItem_Click(object sender, EventArgs e) {
-            if (openFileDialog1.ShowDialog() == DialogResult.OK) {
+            if (openFileDialog1.ShowDialog() == Forms.DialogResult.OK) {
                 Model = new anModelLoader();
                 Model.LoadModel(openFileDialog1.FileName);
                 RenderTimer.Start();
@@ -179,6 +226,8 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
             // очищение текущей матрицы
             Gl.glLoadIdentity();
 
+            cam.Look();
+
             // помещаем состояние матрицы в стек матриц, дальнейшие трансформации затронут только визуализацию объекта
             Gl.glPushMatrix();
 
@@ -191,7 +240,7 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
             Gl.glRotated(dZ, 0, 0, 1);
             // и масштабирование объекта
             Gl.glScaled(zoom, zoom, zoom);
-            for (var i = 0; i < 1; i++) {
+            for (var i = 0; i < 3; i++) {
                 
                 //Glut.glutSolidSphere(1, 16, 16);
                 Glut.glutSolidCube(2);
@@ -215,6 +264,8 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
             Gl.glClearColor(255, 255, 255, 1);
             // очищение текущей матрицы
             Gl.glLoadIdentity();
+            
+            cam.Look();
 
             // помещаем состояние матрицы в стек матриц, дальнейшие трансформации затронут только визуализацию объекта
             Gl.glPushMatrix();
@@ -230,6 +281,8 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
             if (Model != null)
                 Model.DrawModel();
 
+            Glut.glutSolidCone(2, 10, 12, 10);
+
             // возвращаем состояние матрицы
             Gl.glPopMatrix();
 
@@ -240,7 +293,7 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
             AnT.Invalidate();
         }
 
-        private void AnT_Scroll(object sender, ScrollEventArgs e) {
+        private void AnT_Scroll(object sender, Forms.ScrollEventArgs e) {
             Console.WriteLine(e);
         }
 

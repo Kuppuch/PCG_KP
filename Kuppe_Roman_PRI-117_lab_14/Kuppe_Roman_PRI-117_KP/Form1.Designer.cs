@@ -29,9 +29,9 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.загрузитьМодельToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.выбратьМодельДляЗагрузкиToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.помощьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.RenderTimer = new System.Windows.Forms.Timer(this.components);
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.помощьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.button1 = new System.Windows.Forms.Button();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -54,6 +54,9 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
             this.AnT.Load += new System.EventHandler(this.AnT_Load);
             this.AnT.Scroll += new System.Windows.Forms.ScrollEventHandler(this.AnT_Scroll);
             this.AnT.Click += new System.EventHandler(this.AnT_Click);
+            this.AnT.MouseDown += new System.Windows.Forms.MouseEventHandler(this.AnT_MouseDown_1);
+            this.AnT.MouseMove += new System.Windows.Forms.MouseEventHandler(this.AnT_MouseMove);
+            this.AnT.MouseUp += new System.Windows.Forms.MouseEventHandler(this.AnT_MouseUp);
             // 
             // menuStrip1
             // 
@@ -82,6 +85,13 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
             this.выбратьМодельДляЗагрузкиToolStripMenuItem.Text = "Выбрать модель для загрузки";
             this.выбратьМодельДляЗагрузкиToolStripMenuItem.Click += new System.EventHandler(this.выбратьМодельДляЗагрузкиToolStripMenuItem_Click);
             // 
+            // помощьToolStripMenuItem
+            // 
+            this.помощьToolStripMenuItem.Name = "помощьToolStripMenuItem";
+            this.помощьToolStripMenuItem.Size = new System.Drawing.Size(237, 22);
+            this.помощьToolStripMenuItem.Text = "Помощь";
+            this.помощьToolStripMenuItem.Click += new System.EventHandler(this.помощьToolStripMenuItem_Click);
+            // 
             // RenderTimer
             // 
             this.RenderTimer.Interval = 30;
@@ -90,13 +100,6 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
             // openFileDialog1
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
-            // 
-            // помощьToolStripMenuItem
-            // 
-            this.помощьToolStripMenuItem.Name = "помощьToolStripMenuItem";
-            this.помощьToolStripMenuItem.Size = new System.Drawing.Size(237, 22);
-            this.помощьToolStripMenuItem.Text = "Помощь";
-            this.помощьToolStripMenuItem.Click += new System.EventHandler(this.помощьToolStripMenuItem_Click);
             // 
             // button1
             // 

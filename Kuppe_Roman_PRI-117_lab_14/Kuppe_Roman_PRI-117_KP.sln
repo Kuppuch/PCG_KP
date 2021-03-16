@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kuppe_Roman_PRI-117_lab_14", "Kuppe_Roman_PRI-117_lab_14\Kuppe_Roman_PRI-117_lab_14.csproj", "{440B83A1-E8B5-4B93-B6AD-EBBFD6C99B2F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kuppe_Roman_PRI-117_KP", "Kuppe_Roman_PRI-117_KP\Kuppe_Roman_PRI-117_KP.csproj", "{440B83A1-E8B5-4B93-B6AD-EBBFD6C99B2F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
