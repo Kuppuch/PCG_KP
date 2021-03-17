@@ -30,7 +30,16 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
         int os_x = 1, os_y = 0, os_z = 0;
         bool crop = true;
         Camera cam = new Camera();
-        
+        anModelLoader Model = null;
+        private bool mouseRotate;
+        private int rot_cam_X;
+        private int mouseMoveY;
+        private int mouseMoveX;
+        private int mousePointY;
+        private int mousePointX;
+        private bool mouseMove;
+        private bool accessRotate = true;
+
         private void AnT_Load(object sender, EventArgs e) {
             
         }
@@ -83,34 +92,30 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
             Help();
         }
 
-        private void button1_Click(object sender, EventArgs e) {
-
-        }
-
         private void button1_Click_1(object sender, EventArgs e) {
             //Zeroing();
             crop = !crop;
         }
         
         private void MouseEvents() {
-            if (mouseRotate) { 
+            if (mouseRotate && accessRotate) { 
                 AnT.Cursor = Forms.Cursors.SizeAll; //меняем указатель 
-                cam.RotatePosition((float)(localMouseYcoordVar - localMouseYcoord), 0, 1, 0); // крутим камеру
-                rot_cam_X = rot_cam_X + (localMouseXcoordVar - localMouseXcoord); 
+                cam.RotatePosition((float)(mouseMoveY - mousePointY), 0, 1, 0); // крутим камеру
+                rot_cam_X = rot_cam_X + (mouseMoveX - mousePointX); 
                 if ((rot_cam_X > -40) && (rot_cam_X < 40)) 
-                    cam.upDown(((float)(localMouseXcoordVar - localMouseXcoord)) / 10); 
-                localMouseYcoord = localMouseYcoordVar; 
-                localMouseXcoord = localMouseXcoordVar; 
+                    cam.upDown(((float)(mouseMoveX - mousePointX)) / 10); 
+                mousePointY = mouseMoveY; 
+                mousePointX = mouseMoveX; 
             } else { 
-                if (mouseMove) { 
+                if (mouseMove && accessRotate) { 
                     AnT.Cursor = Forms.Cursors.SizeAll; 
-                    cam.MoveCamera((float)(localMouseXcoordVar - localMouseXcoord) / 50); 
-                    cam.Strafe(-((float)(localMouseYcoordVar - localMouseYcoord) / 50)); 
-                    localMouseYcoord = localMouseYcoordVar; 
-                    localMouseXcoord = localMouseXcoordVar; 
+                    cam.MoveCamera((float)(mouseMoveX - mousePointX) / 50); 
+                    cam.Strafe(-((float)(mouseMoveY - mousePointY) / 50)); 
+                    mousePointY = mouseMoveY; 
+                    mousePointX = mouseMoveX; 
                 } else { 
                     AnT.Cursor = Forms.Cursors.Default; // возвращаем курсор 
-                }; 
+                };
             }; 
         }
 
@@ -165,20 +170,37 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
             // вызываем функцию отрисовки сцены
             if (crop) {
                 Draw();
+            } else if (accessRotate) {
+                DrawTirt();
             } else {
                 DrawCrop();
             }
+
             MouseEvents(); 
             cam.update(); 
         }
 
         private void AnT_MouseDown_1(object sender, Forms.MouseEventArgs e) {
-            if (e.Button == Forms.MouseButtons.Left)
+            int circleCenterX1 = 308;
+            int circleCenterX2 = 437;
+            int circleCenterY = 370;
+            int r = 17;
+            if (e.Button == Forms.MouseButtons.Left) {
                 mouseRotate = true;
+                Console.WriteLine(e.X + " !!! " + e.Y);
+                if (e.X > 246 && e.X < 500 && e.Y < 430 && e.Y > 315) {
+                    Console.WriteLine("Попадание");
+                }
+                double d1 = Math.Sqrt(Math.Pow(e.X - circleCenterX1, 2) + Math.Pow(e.Y - circleCenterY, 2));
+                double d2 = Math.Sqrt(Math.Pow(e.X - circleCenterX2, 2) + Math.Pow(e.Y - circleCenterY, 2));
+                if (d1 <= r || d2 <= r) {
+                    Console.WriteLine("Красавчииииииг");
+                }
+            }
             if (e.Button == Forms.MouseButtons.Middle)
                 mouseMove = true;
-            localMouseYcoord = e.X;
-            localMouseXcoord = e.Y;
+            mousePointY = e.X;
+            mousePointX = e.Y;
         }
 
         private void AnT_MouseUp(object sender, Forms.MouseEventArgs e) {
@@ -186,9 +208,21 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
             mouseMove = false;
         }
 
+        private void button2_Click(object sender, EventArgs e) {
+            accessRotate = !accessRotate;
+            if (!accessRotate) {
+                Model = new anModelLoader();
+                Model.LoadModel("C:\\Roman\\study\\4K8S\\PKG\\lab14\\Kuppe_Roman_PRI-117_lab_14\\Kuppe_Roman_PRI-117_KP\\bin\\Debug\\model\\KP2.ASE");
+                cam.PositionCamera(0, -14, -3.5f, 0, 0, -1.5f, 0, 0, 1);
+                RenderTimer.Start();
+            } else {
+                Model = null;
+            }
+        }
+
         private void AnT_MouseMove(object sender, Forms.MouseEventArgs e) {
-            localMouseXcoordVar = e.Y;
-            localMouseYcoordVar = e.X;
+            mouseMoveX = e.Y;
+            mouseMoveY = e.X;
         }
 
         public void Clear() {
@@ -201,14 +235,6 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
         private void загрузитьМодельToolStripMenuItem_Click(object sender, EventArgs e) {
 
         }
-        anModelLoader Model = null;
-        private bool mouseRotate;
-        private int rot_cam_X;
-        private int localMouseYcoordVar;
-        private int localMouseXcoordVar;
-        private int localMouseYcoord;
-        private int localMouseXcoord;
-        private bool mouseMove;
 
         private void выбратьМодельДляЗагрузкиToolStripMenuItem_Click(object sender, EventArgs e) {
             if (openFileDialog1.ShowDialog() == Forms.DialogResult.OK) {
@@ -256,7 +282,42 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
             } 
         }
 
-        // функция отрисовки
+        private void DrawTirt() {
+            // очистка буфера цвета и буфера глубины
+            Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
+
+            Gl.glClearColor(255, 255, 255, 1);
+            // очищение текущей матрицы
+            Gl.glLoadIdentity();
+
+            cam.Look();
+
+            // помещаем состояние матрицы в стек матриц, дальнейшие трансформации затронут только визуализацию объекта
+            Gl.glPushMatrix();
+            // производим перемещение в зависимости от значений, полученных при перемещении ползунков
+            Gl.glTranslated(a, b, c);
+            // поворот по установленной оси
+            Gl.glRotated(dY, 0, 1, 0);
+            Gl.glRotated(dX, 1, 0, 0);
+            Gl.glRotated(dZ, 0, 0, 1);
+            // и масштабирование объекта
+            Gl.glScaled(zoom, zoom, zoom);
+
+            if (Model != null)
+                Model.DrawModel();
+
+            //Glut.glutSolidCone(2, 10, 12, 10);
+
+            // возвращаем состояние матрицы
+            Gl.glPopMatrix();
+
+            // завершаем рисование
+            Gl.glFlush();
+
+            // обновлем элемент AnT
+            AnT.Invalidate();
+        }
+
         private void Draw() {
             // очистка буфера цвета и буфера глубины
             Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
@@ -281,7 +342,7 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
             if (Model != null)
                 Model.DrawModel();
 
-            Glut.glutSolidCone(2, 10, 12, 10);
+            //Glut.glutSolidCone(2, 10, 12, 10);
 
             // возвращаем состояние матрицы
             Gl.glPopMatrix();

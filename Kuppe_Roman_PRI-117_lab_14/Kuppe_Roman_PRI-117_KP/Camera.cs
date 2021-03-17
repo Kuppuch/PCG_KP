@@ -17,6 +17,8 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
         private Vector3D mPos; // Вектор позиции камеры 
         private Vector3D mView; // Направление, куда смотрит камера 
         private Vector3D mUp; // Вектор верхнего направления private 
+        private Vector3D Rotation { get; set; }
+
         Vector3D mStrafe; // Вектор для стрейфа (движения влево и вправо) камеры
 
         private Vector3D Cross(Vector3D vV1, Vector3D vV2, Vector3D vVector2) {
@@ -107,6 +109,7 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
             AVector.x = (CosA + (1 - CosA) * x * x) * vVector.x; 
             AVector.x += ((1 - CosA) * x * y - z * SinA) * vVector.y; 
             AVector.x += ((1 - CosA) * x * z + y * SinA) * vVector.z; 
+
             // Найдем позицию Y 
             AVector.y = ((1 - CosA) * x * y + z * SinA) * vVector.x; 
             AVector.y += (CosA + (1 - CosA) * y * y) * vVector.y; 
@@ -116,6 +119,9 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
             AVector.z = ((1 - CosA) * x * z - y * SinA) * vVector.x; 
             AVector.z += ((1 - CosA) * y * z + x * SinA) * vVector.y; 
             AVector.z += (CosA + (1 - CosA) * z * z) * vVector.z;
+
+            //Rotation * 
+
             mPos.x = mView.x + AVector.x; 
             mPos.y = mView.y + AVector.y; 
             mPos.z = mView.z + AVector.z;
