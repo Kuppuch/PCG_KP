@@ -88,7 +88,7 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
         }
 
         public void RotateView(float speed) {
-            Vector3D vVector; // Полчим вектор взгляда 
+            Vector3D vVector; // Получим вектор взгляда 
             vVector.x = mView.x - mPos.x; 
             vVector.y = mView.y - mPos.y; 
             vVector.z = mView.z - mPos.z; 
@@ -133,7 +133,7 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
             vVector.x = mView.x - mPos.x; 
             vVector.y = mView.y - mPos.y; 
             vVector.z = mView.z - mPos.z; 
-            //vVector.y = 0.0f; // Это запрещает камере подниматься вверх 
+            vVector.y = 0.0f; // Это запрещает камере подниматься вверх 
 
             vVector = Normalize(vVector); 
 

@@ -39,6 +39,9 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
         private int mousePointX;
         private bool mouseMove;
         private bool accessRotate = true;
+        double ScreenW, ScreenH;
+        private float devX;
+        private float devY;
 
         private void AnT_Load(object sender, EventArgs e) {
             
@@ -51,34 +54,21 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
         }
 
         private void Form1_Load(object sender, EventArgs e) {
-            // инициализация бибилиотеки glut
             Glut.glutInit();
-            // инициализация режима экрана
             Glut.glutInitDisplayMode(Glut.GLUT_RGB | Glut.GLUT_DOUBLE);
-
-            // установка цвета очистки экрана (RGBA)
             Gl.glClearColor(255, 255, 255, 1);
-
-            // установка порта вывода
             Gl.glViewport(0, 0, AnT.Width, AnT.Height);
-
-            // активация проекционной матрицы
             Gl.glMatrixMode(Gl.GL_PROJECTION);
-            // очистка матрицы
             Gl.glLoadIdentity();
-
-            // установка перспективы
-            Glu.gluPerspective(45, (float)AnT.Width / (float)AnT.Height, 0.1, 200);
-
             Gl.glMatrixMode(Gl.GL_MODELVIEW);
             Gl.glLoadIdentity();
 
-            // начальная настройка параметров openGL (тест глубины, освещение и первый источник света)
             Gl.glEnable(Gl.GL_DEPTH_TEST);
             Gl.glEnable(Gl.GL_LIGHTING);
             Gl.glEnable(Gl.GL_LIGHT0);
 
-            cam.PositionCamera(0, -15, 5, 0, 0, 0, 0, 1, 0);
+            cam.PositionCamera(0, -15, 5, 0, 90, 0, 0, 1, 0);
+            //cam.PositionCamera(0, 6, -15, 0, 3, 0, 0, 1, 0);
 
             // активация таймера, вызывающего функцию для визуализации
             RenderTimer.Start();
@@ -98,30 +88,29 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
         }
         
         private void MouseEvents() {
-            if (mouseRotate && accessRotate) { 
-                AnT.Cursor = Forms.Cursors.SizeAll; //меняем указатель 
-                cam.RotatePosition((float)(mouseMoveY - mousePointY), 0, 1, 0); // крутим камеру
+            if (mouseRotate /*&& accessRotate*/) { 
+                AnT.Cursor = Forms.Cursors.SizeAll; 
+                cam.RotatePosition((float)(mouseMoveY - mousePointY), 0, 1, 0);
                 rot_cam_X = rot_cam_X + (mouseMoveX - mousePointX); 
                 if ((rot_cam_X > -40) && (rot_cam_X < 40)) 
                     cam.upDown(((float)(mouseMoveX - mousePointX)) / 10); 
                 mousePointY = mouseMoveY; 
                 mousePointX = mouseMoveX; 
             } else { 
-                if (mouseMove && accessRotate) { 
+                if (mouseMove /*&& accessRotate*/) { 
                     AnT.Cursor = Forms.Cursors.SizeAll; 
                     cam.MoveCamera((float)(mouseMoveX - mousePointX) / 50); 
                     cam.Strafe(-((float)(mouseMoveY - mousePointY) / 50)); 
                     mousePointY = mouseMoveY; 
                     mousePointX = mouseMoveX; 
                 } else { 
-                    AnT.Cursor = Forms.Cursors.Default; // возвращаем курсор 
+                    AnT.Cursor = Forms.Cursors.Default;
                 };
             }; 
         }
 
 
         private void RenderTimer_Tick(object sender, EventArgs e) {
-            //bool v = Keyboard.IsKeyDown(Key.Up);
             if (Keyboard.IsKeyDown(Key.W)) {
                 dX = dX + 2;
                 os_x = 1;
@@ -167,28 +156,32 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
             if (Keyboard.IsKeyDown(Key.R)) {
                 Clear();
             }
-            // вызываем функцию отрисовки сцены
+            MouseEvents();
+            cam.update();
             if (crop) {
+                Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
+                Gl.glClearColor(255, 255, 255, 1);
+                Gl.glLoadIdentity();
                 Draw();
-            } else if (accessRotate) {
-                DrawTirt();
+                if (!accessRotate) {
+                    DrawAim();
+                }
             } else {
                 DrawCrop();
             }
 
-            MouseEvents(); 
-            cam.update(); 
+             
         }
 
         private void AnT_MouseDown_1(object sender, Forms.MouseEventArgs e) {
-            int circleCenterX1 = 308;
-            int circleCenterX2 = 437;
-            int circleCenterY = 370;
+            int circleCenterX1 = 316;
+            int circleCenterX2 = 453;
+            int circleCenterY = 279;
             int r = 17;
             if (e.Button == Forms.MouseButtons.Left) {
                 mouseRotate = true;
                 Console.WriteLine(e.X + " !!! " + e.Y);
-                if (e.X > 246 && e.X < 500 && e.Y < 430 && e.Y > 315) {
+                if (e.X > 250 && e.X < 520 && e.Y < 338 && e.Y > 220) {
                     Console.WriteLine("Попадание");
                 }
                 double d1 = Math.Sqrt(Math.Pow(e.X - circleCenterX1, 2) + Math.Pow(e.Y - circleCenterY, 2));
@@ -211,11 +204,12 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
         private void button2_Click(object sender, EventArgs e) {
             accessRotate = !accessRotate;
             if (!accessRotate) {
+                button2.Text = "назад";
                 Model = new anModelLoader();
                 Model.LoadModel("C:\\Roman\\study\\4K8S\\PKG\\lab14\\Kuppe_Roman_PRI-117_lab_14\\Kuppe_Roman_PRI-117_KP\\bin\\Debug\\model\\KP2.ASE");
-                cam.PositionCamera(0, -14, -3.5f, 0, 0, -1.5f, 0, 0, 1);
                 RenderTimer.Start();
             } else {
+                button2.Text = "в тир";
                 Model = null;
             }
         }
@@ -252,7 +246,7 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
             // очищение текущей матрицы
             Gl.glLoadIdentity();
 
-            cam.Look();
+            //cam.Look();
 
             // помещаем состояние матрицы в стек матриц, дальнейшие трансформации затронут только визуализацию объекта
             Gl.glPushMatrix();
@@ -282,61 +276,43 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
             } 
         }
 
-        private void DrawTirt() {
-            // очистка буфера цвета и буфера глубины
-            Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
-
-            Gl.glClearColor(255, 255, 255, 1);
-            // очищение текущей матрицы
-            Gl.glLoadIdentity();
-
-            cam.Look();
-
-            // помещаем состояние матрицы в стек матриц, дальнейшие трансформации затронут только визуализацию объекта
+        private void DrawAim() {
+            Gl.glMatrixMode(Gl.GL_PROJECTION);
             Gl.glPushMatrix();
-            // производим перемещение в зависимости от значений, полученных при перемещении ползунков
-            Gl.glTranslated(a, b, c);
-            // поворот по установленной оси
-            Gl.glRotated(dY, 0, 1, 0);
-            Gl.glRotated(dX, 1, 0, 0);
-            Gl.glRotated(dZ, 0, 0, 1);
-            // и масштабирование объекта
-            Gl.glScaled(zoom, zoom, zoom);
-
-            if (Model != null)
-                Model.DrawModel();
-
-            //Glut.glutSolidCone(2, 10, 12, 10);
-
-            // возвращаем состояние матрицы
-            Gl.glPopMatrix();
-
-            // завершаем рисование
+            Gl.glLoadIdentity();
+            Glu.gluOrtho2D(AnT.Width, 0, 0, AnT.Height);
+            Gl.glMatrixMode(Gl.GL_MODELVIEW);
+            Gl.glLoadIdentity();
+            Gl.glDisable(Gl.GL_CULL_FACE);
+            Gl.glClear(Gl.GL_DEPTH_BUFFER_BIT);
+            Gl.glColor3f(0, 255, 0);
+            Gl.glPushMatrix();
+            Gl.glDisable(Gl.GL_DEPTH_TEST);
+            DrawAimPart((float)AnT.Width - mouseMoveY + 13f, (float)AnT.Height - mouseMoveX - 4f, "[o]");
+            Gl.glEnable(Gl.GL_DEPTH_TEST);
             Gl.glFlush();
-
-            // обновлем элемент AnT
             AnT.Invalidate();
         }
 
+        private void DrawAimPart(float x, float y, string text) {
+            Gl.glRasterPos2f(x, y);
+
+            foreach (char char_for_draw in text) {
+                Glut.glutBitmapCharacter(Glut.GLUT_BITMAP_9_BY_15, char_for_draw);
+            }
+        }
+
         private void Draw() {
-            // очистка буфера цвета и буфера глубины
-            Gl.glClear(Gl.GL_COLOR_BUFFER_BIT | Gl.GL_DEPTH_BUFFER_BIT);
-
-            Gl.glClearColor(255, 255, 255, 1);
-            // очищение текущей матрицы
-            Gl.glLoadIdentity();
+            Gl.glMatrixMode(Gl.GL_PROJECTION);
+            Gl.glPopMatrix();
+            Gl.glMatrixMode(Gl.GL_MODELVIEW);
+            //cam.Look();
             
-            cam.Look();
-
-            // помещаем состояние матрицы в стек матриц, дальнейшие трансформации затронут только визуализацию объекта
-            Gl.glPushMatrix();
-            // производим перемещение в зависимости от значений, полученных при перемещении ползунков
+            Glu.gluPerspective(45, (float)AnT.Width / (float)AnT.Height, 0.1, 200);
             Gl.glTranslated(a, b, c);
-            // поворот по установленной оси
             Gl.glRotated(dY, 0, 1, 0);
             Gl.glRotated(dX, 1, 0, 0);
             Gl.glRotated(dZ, 0, 0, 1);
-            // и масштабирование объекта
             Gl.glScaled(zoom, zoom, zoom);
 
             if (Model != null)
@@ -344,13 +320,8 @@ namespace Kuppe_Roman_PRI_117_lab_14 {
 
             //Glut.glutSolidCone(2, 10, 12, 10);
 
-            // возвращаем состояние матрицы
             Gl.glPopMatrix();
-
-            // завершаем рисование
             Gl.glFlush();
-
-            // обновлем элемент AnT
             AnT.Invalidate();
         }
 
